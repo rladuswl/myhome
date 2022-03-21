@@ -27,8 +27,9 @@ public class BoardController {
     private BoardValidator boardValidator;
 
     @GetMapping("/list")
-    public String list(Model model, @PageableDefault(size=3) Pageable pageable) {
-        Page<Board> boards = boardRepository.findAll(pageable);
+    public String list(Model model, @PageableDefault(size=3) Pageable pageable, @RequestParam(required = false, defaultValue = "") String searchText) {
+//        Page<Board> boards = boardRepository.findAll(pageable);
+        Page<Board> boards = boardRepository.findByTitleContainingOrContentContaining(searchText, searchText, pageable);
         // boards.getTotalElements() -> list 총 건수에 사용
 
         int startPage = Math.max(1, boards.getPageable().getPageNumber() - 4);
