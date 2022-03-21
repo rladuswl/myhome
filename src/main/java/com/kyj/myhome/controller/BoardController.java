@@ -41,7 +41,7 @@ public class BoardController {
     }
 
     @PostMapping("/form")
-    public String formsubmit(@Valid Board board, BindingResult bindingResult) {
+    public String formsubmit(@Valid Board board, BindingResult bindingResult) { // 원래는 @Valid 전에 @ModelAttribute
         boardValidator.validate(board, bindingResult);
         if (bindingResult.hasErrors()) {
             return "board/form";
