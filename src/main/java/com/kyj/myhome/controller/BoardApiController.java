@@ -3,6 +3,7 @@ package com.kyj.myhome.controller;
 import com.kyj.myhome.model.Board;
 import com.kyj.myhome.repository.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.util.StringUtils;
 
@@ -48,8 +49,10 @@ public class BoardApiController {
                 });
     }
 
+    @Secured("ROLE_ADMIN") // 권한으로 막기 위해 MethodSecurityConfig에서 처리
     @DeleteMapping("/boards/{id}")
     void deleteboard(@PathVariable Long id) {
+        System.out.println("BoardApiController.deleteboard");
         boardRepository.deleteById(id);
     }
 }
