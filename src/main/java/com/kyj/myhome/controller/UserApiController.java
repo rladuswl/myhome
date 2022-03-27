@@ -1,8 +1,11 @@
 package com.kyj.myhome.controller;
 
 import com.kyj.myhome.model.Board;
+import com.kyj.myhome.model.QUser;
 import com.kyj.myhome.model.User;
 import com.kyj.myhome.repository.UserRepository;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +22,46 @@ public class UserApiController {
     private UserRepository userRepository;
 
     @GetMapping("/users")
-    List<User> all() {
-        List<User> users = userRepository.findAll();
-        log.debug("getBoards().size() 호출 전");
-        log.debug("getBoards().size() : {}", users.get(0).getBoards().size());
-        log.debug("getBoards().size() 호출 후");
+    Iterable<User> all(@RequestParam(required = false) String method, @RequestParam(required = false) String text) {
+        Iterable<User> users = null;
+//        log.debug("getBoards().size() 호출 전");
+//        log.debug("getBoards().size() : {}", users.get(0).getBoards().size());
+//        log.debug("getBoards().size() 호출 후");
+
+        // 방법1
+        if ("query".equals(method)) {
+            users = userRepository.findByUsernameQuery(text);
+        }
+        // 방법2
+        else if ("nativeQuery".equals(method)){
+            users = userRepository.findByUsernameNativeQuery(text);
+        }
+        // 방법3
+        else if ("querydsl".equals(method)) {
+            QUser user = QUser.user;
+
+            // BooleanExpression 사용
+//            BooleanExpression b = user.username.contains(text);
+//            if (true) {
+//                b = b.and(user.username.eq("hi"));
+//            }
+//            users = userRepository.findAll(b);
+
+            Predicate predicate = user.username.contains(text);
+            users = userRepository.findAll(predicate);
+        }
+        // 방법4 - CustomizedUserRepositoryImpl 클래스에 정의
+        else if ("querydslCustom".equals(method)) {
+            users = userRepository.findByUsernameCustom(text);
+        }
+        // 방법5 - CustomizedUserRepositoryImpl 클래스에 정의
+        else if ("jdbc".equals(method)) {
+            users = userRepository.findByUsernameJdbc(text);
+        }
+        // 방법6
+        else {
+            users = userRepository.findAll();
+        }
         return users;
     }
 
